@@ -16,8 +16,8 @@ Tick an exit condition only when you have watched it hold, not when it seems lik
 
 ### Stage 1 — Verification before features
 
-- [ ] `CLAUDE.md` written by hand, under 40 lines
-- [ ] Parser implemented with tests covering the ugly inputs (blank lines, unicode, duplicate highlights)
+- [x] `CLAUDE.md` written by hand, under 40 lines
+- [x] Parser implemented with tests covering the ugly inputs (blank lines, unicode, duplicate highlights)
 - [ ] `.claude/skills/verify-parser/SKILL.md` exists, scoped to one category, has a Gotchas section
 - [ ] **Exit:** `npm test` green from a cold clone AND the skill invoked by name in a session
 
@@ -77,6 +77,7 @@ Keep entries short. The "what surprised me" column is the one worth writing.
 | #   | Date       | Stage | Mins | What I practiced                                                                                                                                                                                                                                                            | What surprised me               |
 | --- | ---------- | ----- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------- |
 | 1   | 2026-08-08 | 1     | ?    | Blind-spot pass + one-question-at-a-time interview to scope the Kindle-only parser (types, error handling, dedup boundary); wrote fixtures and a full failing test suite before any parser implementation; set up TS strict + Vitest so `npm test`/`typecheck` actually run | _(fill in before next session)_ | How easy it is to deviate from the original plan. We ended doing some learnings a bit out of order. |
+| 2   | 2026-08-09 | 1     | ?    | Reviewed the failing test suite for duplication/assertion depth/coverage gaps; extracted a shared unwrap helper and added 5 more edge-case fixtures (mixed-validity, CRLF, two more malformed shapes, empty input, unparseable date) before touching parser code; asked a single clarifying question to resolve a real design fork (truncated-file behavior) instead of guessing; then implemented `parseKindleClippings` against all 16 tests on explicit request, switching out of coach mode for that step; used Claude Code remote control | I was able to make meaningful progress by using Claude Code remote control. This combined with Auto mode allowed me to make progress while on the go effectively |
 
 ---
 
@@ -87,7 +88,7 @@ you read about it. Anything still at 0 by Stage 6 is a gap to design a session a
 
 | Technique                                    | Uses | Notes                                                                                                        |
 | -------------------------------------------- | ---: | ------------------------------------------------------------------------------------------------------------ |
-| Wrote verification before implementation     |    1 | Fixtures + full failing test suite for the Kindle parser, before the parser existed                          |
+| Wrote verification before implementation     |    2 | Fixtures + full failing test suite for the Kindle parser, before the parser existed; second round added 5 more edge-case fixtures/tests before the parser was written |
 | `/goal` with a measurable condition          |    0 |                                                                                                              |
 | `/loop` (fixed interval)                     |    0 |                                                                                                              |
 | `/loop` (self-paced)                         |    0 |                                                                                                              |
