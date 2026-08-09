@@ -19,6 +19,7 @@ Tick an exit condition only when you have watched it hold, not when it seems lik
 - [x] `CLAUDE.md` written by hand, under 40 lines
 - [x] Parser implemented with tests covering the ugly inputs (blank lines, unicode, duplicate highlights)
 - [ ] `.claude/skills/verify-parser/SKILL.md` exists, scoped to one category, has a Gotchas section
+- [ ] Parser run against a real `My Clippings.txt` export (not fixtures) via the verify-parser skill, output spot-checked against the raw file
 - [ ] **Exit:** `npm test` green from a cold clone AND the skill invoked by name in a session
 
 ### Stage 2 — Autonomous goals
