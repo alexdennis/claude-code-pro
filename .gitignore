@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.env.local
+*.sqlite
+*.sqlite-journal
+
+# Claude Code
+.claude/worktrees/
+.claude/settings.local.json
+
+# Playwright
+test-results/
+playwright-report/
