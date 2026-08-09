@@ -1,0 +1,27 @@
+{
+  "name": "claude-code-pro",
+  "version": "1.0.0",
+  "description": "A deliberate-practice repo. The software is real, but it exists to give a set of Claude Code techniques something to bite on.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexdennis/claude-code-pro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexdennis/claude-code-pro/issues"
+  },
+  "homepage": "https://github.com/alexdennis/claude-code-pro#readme",
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}

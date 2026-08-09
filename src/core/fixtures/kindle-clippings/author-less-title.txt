@@ -1,0 +1,6 @@
+Meeting Notes - Q3 Planning
+- Your Highlight on page 2 | location 15-16 | Added on Monday, 3 August 2020 08:02:47
+
+Ship the parser before touching the UI.
+
+==========
