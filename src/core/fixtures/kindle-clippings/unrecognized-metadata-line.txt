@@ -1,0 +1,6 @@
+Some Corrupted Export (Unknown Author)
+This line does not match any known Kindle metadata format at all.
+
+Content that follows a metadata line we cannot classify as highlight, note, or bookmark.
+
+==========
