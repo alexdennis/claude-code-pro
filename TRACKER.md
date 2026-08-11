@@ -5,7 +5,7 @@ Claude can update it for you — ask it to append the session log entry and tick
 whatever exit conditions now hold.
 
 **Started:** 2026-08-08
-**Current stage:** 1
+**Current stage:** 2
 **Budget:** 2–4 hrs/week
 
 ---
@@ -18,9 +18,9 @@ Tick an exit condition only when you have watched it hold, not when it seems lik
 
 - [x] `CLAUDE.md` written by hand, under 40 lines
 - [x] Parser implemented with tests covering the ugly inputs (blank lines, unicode, duplicate highlights)
-- [ ] `.claude/skills/verify-parser/SKILL.md` exists, scoped to one category, has a Gotchas section
-- [ ] Parser run against a real `My Clippings.txt` export (not fixtures) via the verify-parser skill, output spot-checked against the raw file
-- [ ] **Exit:** `npm test` green from a cold clone AND the skill invoked by name in a session
+- [x] `.claude/skills/verify-parser/SKILL.md` exists, scoped to one category, has a Gotchas section
+- [x] Parser run against a real `My Clippings.txt` export (not fixtures) via the verify-parser skill, output spot-checked against the raw file
+- [x] **Exit:** `npm test` green from a cold clone AND the skill invoked by name in a session
 
 ### Stage 2 — Autonomous goals
 
@@ -79,6 +79,7 @@ Keep entries short. The "what surprised me" column is the one worth writing.
 | --- | ---------- | ----- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------- |
 | 1   | 2026-08-08 | 1     | ?    | Blind-spot pass + one-question-at-a-time interview to scope the Kindle-only parser (types, error handling, dedup boundary); wrote fixtures and a full failing test suite before any parser implementation; set up TS strict + Vitest so `npm test`/`typecheck` actually run | _(fill in before next session)_ | How easy it is to deviate from the original plan. We ended doing some learnings a bit out of order. |
 | 2   | 2026-08-09 | 1     | ?    | Reviewed the failing test suite for duplication/assertion depth/coverage gaps; extracted a shared unwrap helper and added 5 more edge-case fixtures (mixed-validity, CRLF, two more malformed shapes, empty input, unparseable date) before touching parser code; asked a single clarifying question to resolve a real design fork (truncated-file behavior) instead of guessing; then implemented `parseKindleClippings` against all 16 tests on explicit request, switching out of coach mode for that step; used Claude Code remote control | I was able to make meaningful progress by using Claude Code remote control. This combined with Auto mode allowed me to make progress while on the go effectively |
+| 3   | 2026-08-10 | 1     | ?    | Pulled a real `My Clippings.txt` and ran the parser against it directly (0/38 parsed); diagnosed the real bug (case-sensitive `location` vs Kindle's actual `Location`) and investigated a second suspected bug that turned out not to be real (per-entry BOM — already handled by `trim()`); wrote a failing regression test reproducing the real format before touching parser code, confirmed it red, then fixed the regex + type-label lookup; reverified against the real file (38/38) and the full suite; wrote `.claude/skills/verify-parser/SKILL.md` scoped to real-file spot-checking with a Gotchas section from this session's findings, then invoked it by name (`/verify-parser`) against the real file and confirmed `npm test` green from an actual cold clone — closing out Stage 1 | _(fill in before next session)_ |
 
 ---
 
@@ -89,14 +90,14 @@ you read about it. Anything still at 0 by Stage 6 is a gap to design a session a
 
 | Technique                                    | Uses | Notes                                                                                                        |
 | -------------------------------------------- | ---: | ------------------------------------------------------------------------------------------------------------ |
-| Wrote verification before implementation     |    2 | Fixtures + full failing test suite for the Kindle parser, before the parser existed; second round added 5 more edge-case fixtures/tests before the parser was written |
+| Wrote verification before implementation     |    3 | Fixtures + full failing test suite for the Kindle parser, before the parser existed; second round added 5 more edge-case fixtures/tests before the parser was written; third round: regression test for a real-data bug (case-sensitive Location), confirmed red, before fixing the regex |
 | `/goal` with a measurable condition          |    0 |                                                                                                              |
 | `/loop` (fixed interval)                     |    0 |                                                                                                              |
 | `/loop` (self-paced)                         |    0 |                                                                                                              |
 | `claude --worktree`                          |    0 |                                                                                                              |
 | Subagent with `isolation: worktree`          |    0 |                                                                                                              |
 | `/batch` on a multi-file change              |    0 |                                                                                                              |
-| Wrote or revised a skill                     |    0 |                                                                                                              |
+| Wrote or revised a skill                     |    1 | `.claude/skills/verify-parser/SKILL.md`, invoked by name against a real My Clippings.txt export             |
 | Hook fired and caught something              |    0 |                                                                                                              |
 | `Esc` to halt a drifting agent               |    0 |                                                                                                              |
 | `/rewind` to recover                         |    0 |                                                                                                              |
