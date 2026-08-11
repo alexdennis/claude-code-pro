@@ -47,12 +47,12 @@ const SEPARATOR_LINE = /^=+$/m;
 const TITLE_LINE = /^(.*) \(([^()]*)\)$/;
 
 const METADATA_LINE =
-  /^- Your (Highlight|Note|Bookmark) (?:on page (\d+) \| location (\d+)(?:-(\d+))?|at location (\d+)(?:-(\d+))?) \| Added on (.+)$/;
+  /^- Your (Highlight|Note|Bookmark) (?:on page (\d+) \| location (\d+)(?:-(\d+))?|at location (\d+)(?:-(\d+))?) \| Added on (.+)$/i;
 
 const TYPE_BY_LABEL: Record<string, ClippingType> = {
-  Highlight: "highlight",
-  Note: "note",
-  Bookmark: "bookmark",
+  highlight: "highlight",
+  note: "note",
+  bookmark: "bookmark",
 };
 
 function stripBom(input: string): string {
@@ -81,7 +81,7 @@ function parseEntry(raw: string): ParseResult {
 
   const [, label, pageStr, rangeLocationStart, rangeLocationEnd, soloLocationStart, soloLocationEnd, addedAtRaw] =
     match;
-  const type = TYPE_BY_LABEL[label as string];
+  const type = TYPE_BY_LABEL[(label as string).toLowerCase()];
   if (type === undefined) {
     return { ok: false, error: `unrecognized clipping label: ${label}`, raw };
   }

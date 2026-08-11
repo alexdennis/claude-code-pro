@@ -217,4 +217,29 @@ describe("parseKindleClippings", () => {
     expect(clipping.addedAt).toBeNull();
     expect(clipping.addedAtRaw).toBe("Whenever I felt like it");
   });
+
+  it("matches 'Location' regardless of case, as real Kindle exports capitalize it", () => {
+    const results = parseKindleClippings(loadFixture("capitalized-location.txt"));
+    expect(results).toHaveLength(2);
+
+    const highlight = expectSuccess(results[0]);
+    expect(highlight).toMatchObject({
+      type: "highlight",
+      title: "Meditations",
+      author: "Marcus Aurelius",
+      page: 12,
+      locationStart: 200,
+      locationEnd: 202,
+      content: "You have power over your mind, not outside events.",
+    });
+
+    const bookmark = expectSuccess(results[1]);
+    expect(bookmark).toMatchObject({
+      type: "bookmark",
+      page: null,
+      locationStart: 450,
+      locationEnd: null,
+      content: null,
+    });
+  });
 });
