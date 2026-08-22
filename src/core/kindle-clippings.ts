@@ -1,4 +1,4 @@
-export type ClippingType = "highlight" | "note" | "bookmark";
+export type ClippingType = "highlights" | "note" | "bookmark";
 
 interface ClippingBase {
   type: ClippingType;
