@@ -5,7 +5,7 @@ Claude can update it for you — ask it to append the session log entry and tick
 whatever exit conditions now hold.
 
 **Started:** 2026-08-08
-**Current stage:** 4
+**Current stage:** 5
 **Budget:** 2–4 hrs/week
 
 ---
@@ -37,10 +37,10 @@ Tick an exit condition only when you have watched it hold, not when it seems lik
 
 ### Stage 4 — Visual verification
 
-- [ ] React + Vite front end rendering highlights
-- [ ] Playwright screenshot flow Claude can invoke itself
-- [ ] Written UI spec for Claude to diff against
-- [ ] **Exit:** Claude caught a layout regression unprompted
+- [x] React + Vite front end rendering highlights
+- [x] Playwright screenshot flow Claude can invoke itself
+- [x] Written UI spec for Claude to diff against
+- [x] **Exit:** Claude caught a layout regression unprompted (demonstrated deliberately, not organically — judged to satisfy the spirit of the exercise)
 
 ### Stage 5 — Performance as a goal
 
@@ -82,6 +82,7 @@ Keep entries short. The "what surprised me" column is the one worth writing.
 | 3 | 2026-08-10 | 1 | ? | Pulled a real `My Clippings.txt` and ran the parser against it directly (0/38 parsed); diagnosed the real bug (case-sensitive `location` vs Kindle's actual `Location`) and investigated a second suspected bug that turned out not to be real (per-entry BOM — already handled by `trim()`); wrote a failing regression test reproducing the real format before touching parser code, confirmed it red, then fixed the regex + type-label lookup; reverified against the real file (38/38) and the full suite; wrote `.claude/skills/verify-parser/SKILL.md` scoped to real-file spot-checking with a Gotchas section from this session's findings, then invoked it by name (`/verify-parser`) against the real file and confirmed `npm test` green from an actual cold clone — closing out Stage 1 | _(fill in before next session)_ |
 | 4 | 2026-08-22 | 2 | ? | Committed three deliberate bugs directly to `main` (a plural-vs-singular type typo, a plural-vs-singular regex literal, and a wrong BOM code point); ran `/goal` in auto mode from a fresh, memory-blind session validated against a second real export (`My Clippings 2.txt`); that session found and fixed all three unattended, re-verified via the verify-parser skill and the full suite, and correctly left the fix uncommitted since it wasn't asked to commit; reconciled the tracker's literal wording ("on a branch", "≥5 turns") against what actually happened rather than assuming a mismatch meant failure — decided both counted in spirit — then moved the transcript into `docs/logs/` and closed out Stage 2 | It was hard to introduce a meaningful bug that would give the AI >= 5 turns to solve or maybe I have gotten lazy |
 | 5 | 2026-08-22 | 3 | ? | Built the SQLite storage layer on `node:sqlite`'s built-in `DatabaseSync` (no new dependency) and a minimal Fastify API (`POST /clippings/import`, `GET /clippings`), all implemented directly on explicit request; hit a real gotcha getting `npm run start` working (the project's `.js`-extension imports don't resolve under bare `node --experimental-strip-types`, since Node's loader doesn't remap `.js` back to sibling `.ts` files) and added `tsx` to fix it; added Prettier since no formatter existed yet; wrote a `PostToolUse` hook (format + typecheck on edit) as a script + `.claude/settings.json`, pipe-tested it against a synthesized stdin payload before wiring it in, then proved it live by making a real type-breaking edit through the Edit tool and watching it block in the same turn before reverting; user then ran the server manually and confirmed `GET /clippings` worked end to end | _(fill in before next session)_ |
+| 6 | 2026-08-22 | 4 | ? | Built a standalone React + Vite front end (`web/`) rendering clippings via a dev-server proxy to the Fastify API; wrote `web/UI_SPEC.md` before wiring verification, so a screenshot diff could be judged as regression-vs-intentional rather than just flagged; wired Playwright (`e2e/ui.spec.ts`) with checked-in baselines and a `verify-ui` skill mirroring `verify-parser`; demonstrated the exit condition with a real CSS regression — first attempt produced a false pass because the test only rendered one card, so row-vs-column layout was invisible; fixed the test to use two clippings, re-baselined, then caught the same regression for real and read the diff before reverting; fixed two other real gaps found along the way (Vitest's default glob picking up the Playwright `.spec.ts` file and failing on it; root `tsconfig.json` silently excluding `playwright.config.ts`/`e2e/`/`vitest.config.ts` from typecheck); an initial screenshot for the README accidentally captured the user's real Kindle highlights instead of fixture data — caught before committing, discarded, regenerated against isolated fixture-seeded servers without disturbing the user's live session | _(fill in before next session)_ |
 
 ---
 
@@ -99,7 +100,7 @@ you read about it. Anything still at 0 by Stage 6 is a gap to design a session a
 | `claude --worktree`                          |    0 |                                                                                                                                                                                                                                                                                           |
 | Subagent with `isolation: worktree`          |    0 |                                                                                                                                                                                                                                                                                           |
 | `/batch` on a multi-file change              |    0 |                                                                                                                                                                                                                                                                                           |
-| Wrote or revised a skill                     |    1 | `.claude/skills/verify-parser/SKILL.md`, invoked by name against a real My Clippings.txt export                                                                                                                                                                                           |
+| Wrote or revised a skill                     |    2 | `.claude/skills/verify-parser/SKILL.md`, invoked by name against a real My Clippings.txt export; `.claude/skills/verify-ui/SKILL.md` packaging the Playwright + UI spec verification loop                                                                                                |
 | Hook fired and caught something              |    1 | `PostToolUse` format+typecheck hook blocked a real type-breaking edit live, in the same turn, before the change was ever noticed manually                                                                                                                                                 |
 | `Esc` to halt a drifting agent               |    0 |                                                                                                                                                                                                                                                                                           |
 | `/rewind` to recover                         |    0 |                                                                                                                                                                                                                                                                                           |
