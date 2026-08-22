@@ -2,9 +2,17 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { parseKindleClippings } from "./kindle-clippings.js";
-import type { Clipping, ParseFailure, ParseResult } from "./kindle-clippings.js";
+import type {
+  Clipping,
+  ParseFailure,
+  ParseResult,
+} from "./kindle-clippings.js";
 
-const fixturesDir = path.join(import.meta.dirname, "fixtures", "kindle-clippings");
+const fixturesDir = path.join(
+  import.meta.dirname,
+  "fixtures",
+  "kindle-clippings",
+);
 
 function loadFixture(name: string): string {
   return readFileSync(path.join(fixturesDir, name), "utf-8");
@@ -96,7 +104,9 @@ describe("parseKindleClippings", () => {
   });
 
   it("does not deduplicate repeated highlights from the same location", () => {
-    const results = parseKindleClippings(loadFixture("duplicate-highlight.txt"));
+    const results = parseKindleClippings(
+      loadFixture("duplicate-highlight.txt"),
+    );
     expect(results).toHaveLength(2);
 
     const first = expectSuccess(results[0]);
@@ -150,7 +160,9 @@ describe("parseKindleClippings", () => {
 
     const before = expectSuccess(results[0]);
     expect(before.title).toBe("Atomic Habits");
-    expect(before.content).toBe("Habits are the compound interest of self-improvement.");
+    expect(before.content).toBe(
+      "Habits are the compound interest of self-improvement.",
+    );
 
     const failure = expectFailure(results[1]);
     expect(failure.raw).toContain("Untitled Highlight Export Glitch");
@@ -181,7 +193,9 @@ describe("parseKindleClippings", () => {
   });
 
   it("recovers the last entry when the file is truncated with no trailing separator", () => {
-    const results = parseKindleClippings(loadFixture("missing-trailing-separator.txt"));
+    const results = parseKindleClippings(
+      loadFixture("missing-trailing-separator.txt"),
+    );
     expect(results).toHaveLength(1);
 
     const clipping = expectSuccess(results[0]);
@@ -197,7 +211,9 @@ describe("parseKindleClippings", () => {
   });
 
   it("returns a ParseFailure for a metadata line matching no known clipping type", () => {
-    const results = parseKindleClippings(loadFixture("unrecognized-metadata-line.txt"));
+    const results = parseKindleClippings(
+      loadFixture("unrecognized-metadata-line.txt"),
+    );
     expect(results).toHaveLength(1);
 
     const failure = expectFailure(results[0]);
@@ -219,7 +235,9 @@ describe("parseKindleClippings", () => {
   });
 
   it("matches 'Location' regardless of case, as real Kindle exports capitalize it", () => {
-    const results = parseKindleClippings(loadFixture("capitalized-location.txt"));
+    const results = parseKindleClippings(
+      loadFixture("capitalized-location.txt"),
+    );
     expect(results).toHaveLength(2);
 
     const highlight = expectSuccess(results[0]);

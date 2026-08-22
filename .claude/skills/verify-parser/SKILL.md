@@ -34,7 +34,9 @@ structurally can't cover, a real export the fixtures don't anticipate.
 
    const ok = results.filter((r) => r.ok);
    const failed = results.filter((r) => !r.ok);
-   console.log(`total: ${results.length}, ok: ${ok.length}, failed: ${failed.length}`);
+   console.log(
+     `total: ${results.length}, ok: ${ok.length}, failed: ${failed.length}`,
+   );
 
    for (const f of failed) {
      console.log("--- failure ---");
