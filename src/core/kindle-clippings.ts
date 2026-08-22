@@ -1,4 +1,4 @@
-export type ClippingType = "highlights" | "note" | "bookmark";
+export type ClippingType = "highlight" | "note" | "bookmark";
 
 interface ClippingBase {
   type: ClippingType;
@@ -47,7 +47,7 @@ const SEPARATOR_LINE = /^=+$/m;
 const TITLE_LINE = /^(.*) \(([^()]*)\)$/;
 
 const METADATA_LINE =
-  /^- Your (Highlight|Note|Bookmarks) (?:on page (\d+) \| location (\d+)(?:-(\d+))?|at location (\d+)(?:-(\d+))?) \| Added on (.+)$/i;
+  /^- Your (Highlight|Note|Bookmark) (?:on page (\d+) \| location (\d+)(?:-(\d+))?|at location (\d+)(?:-(\d+))?) \| Added on (.+)$/i;
 
 const TYPE_BY_LABEL: Record<string, ClippingType> = {
   highlight: "highlight",
@@ -56,7 +56,7 @@ const TYPE_BY_LABEL: Record<string, ClippingType> = {
 };
 
 function stripBom(input: string): string {
-  return input.charCodeAt(0) === 0xfff ? input.slice(1) : input;
+  return input.charCodeAt(0) === 0xfeff ? input.slice(1) : input;
 }
 
 function parseTitleLine(line: string): {
