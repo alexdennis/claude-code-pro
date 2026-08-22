@@ -47,7 +47,7 @@ const SEPARATOR_LINE = /^=+$/m;
 const TITLE_LINE = /^(.*) \(([^()]*)\)$/;
 
 const METADATA_LINE =
-  /^- Your (Highlight|Note|Bookmark) (?:on page (\d+) \| location (\d+)(?:-(\d+))?|at location (\d+)(?:-(\d+))?) \| Added on (.+)$/i;
+  /^- Your (Highlight|Note|Bookmarks) (?:on page (\d+) \| location (\d+)(?:-(\d+))?|at location (\d+)(?:-(\d+))?) \| Added on (.+)$/i;
 
 const TYPE_BY_LABEL: Record<string, ClippingType> = {
   highlight: "highlight",
@@ -59,7 +59,10 @@ function stripBom(input: string): string {
   return input.charCodeAt(0) === 0xfeff ? input.slice(1) : input;
 }
 
-function parseTitleLine(line: string): { title: string; author: string | null } {
+function parseTitleLine(line: string): {
+  title: string;
+  author: string | null;
+} {
   const match = TITLE_LINE.exec(line);
   if (match === null) return { title: line, author: null };
   return { title: match[1] as string, author: match[2] as string };
@@ -76,11 +79,23 @@ function parseEntry(raw: string): ParseResult {
 
   const match = METADATA_LINE.exec(metadataLine);
   if (match === null) {
-    return { ok: false, error: "metadata line did not match a known clipping format", raw };
+    return {
+      ok: false,
+      error: "metadata line did not match a known clipping format",
+      raw,
+    };
   }
 
-  const [, label, pageStr, rangeLocationStart, rangeLocationEnd, soloLocationStart, soloLocationEnd, addedAtRaw] =
-    match;
+  const [
+    ,
+    label,
+    pageStr,
+    rangeLocationStart,
+    rangeLocationEnd,
+    soloLocationStart,
+    soloLocationEnd,
+    addedAtRaw,
+  ] = match;
   const type = TYPE_BY_LABEL[(label as string).toLowerCase()];
   if (type === undefined) {
     return { ok: false, error: `unrecognized clipping label: ${label}`, raw };
@@ -89,7 +104,8 @@ function parseEntry(raw: string): ParseResult {
   const page = pageStr === undefined ? null : Number(pageStr);
   const locationStart = Number(rangeLocationStart ?? soloLocationStart);
   const locationEndStr = rangeLocationEnd ?? soloLocationEnd;
-  const locationEnd = locationEndStr === undefined ? null : Number(locationEndStr);
+  const locationEnd =
+    locationEndStr === undefined ? null : Number(locationEndStr);
 
   const parsedDate = new Date(addedAtRaw as string);
   const addedAt = Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
@@ -109,16 +125,27 @@ function parseEntry(raw: string): ParseResult {
 
   switch (type) {
     case "bookmark":
-      return { ok: true, clipping: { ...base, type: "bookmark", content: null } };
+      return {
+        ok: true,
+        clipping: { ...base, type: "bookmark", content: null },
+      };
     case "highlight":
-      return { ok: true, clipping: { ...base, type: "highlight", content: contentText } };
+      return {
+        ok: true,
+        clipping: { ...base, type: "highlight", content: contentText },
+      };
     case "note":
-      return { ok: true, clipping: { ...base, type: "note", content: contentText } };
+      return {
+        ok: true,
+        clipping: { ...base, type: "note", content: contentText },
+      };
   }
 }
 
 export function parseKindleClippings(input: string): ParseResult[] {
-  const normalized = stripBom(input).replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  const normalized = stripBom(input)
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n");
 
   return normalized
     .split(SEPARATOR_LINE)
@@ -126,4 +153,3 @@ export function parseKindleClippings(input: string): ParseResult[] {
     .filter((entry) => entry.length > 0)
     .map(parseEntry);
 }
-
