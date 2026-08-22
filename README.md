@@ -49,6 +49,8 @@ is checked against [code.claude.com/docs](https://code.claude.com/docs/en/overvi
 **Marginalia** ingests markdown highlight exports (Kindle, Readwise, hand-written
 notes), makes them searchable, and serves them through an API and a small web UI.
 
+![Marginalia UI showing a highlight and a bookmark card](docs/screenshot.png)
+
 It was chosen because each technique needs a specific affordance:
 
 | Technique               | What the project provides                              |

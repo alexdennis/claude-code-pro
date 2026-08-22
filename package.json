@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "start": "tsx src/main.ts"
+    "start": "tsx src/main.ts",
+    "test:e2e": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
   },
   "homepage": "https://github.com/alexdennis/claude-code-pro#readme",
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@types/node": "^26.2.0",
     "prettier": "^3.9.6",
     "tsx": "^4.23.12",
