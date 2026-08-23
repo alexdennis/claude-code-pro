@@ -1,10 +1,20 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import type { DatabaseSync } from "node:sqlite";
 import { parseKindleClippings } from "../core/kindle-clippings.js";
-import { insertClippings, listClippings } from "../storage/clippings-store.js";
+import {
+  insertClippings,
+  searchClippings,
+} from "../storage/clippings-store.js";
 
 interface ImportBody {
   text: string;
+}
+
+interface ClippingsQuery {
+  q?: string;
+  sort?: string;
+  limit?: string;
+  cursor?: string;
 }
 
 export function buildServer(db: DatabaseSync): FastifyInstance {
@@ -40,7 +50,19 @@ export function buildServer(db: DatabaseSync): FastifyInstance {
     },
   );
 
-  app.get("/clippings", async () => listClippings(db));
+  app.get<{ Querystring: ClippingsQuery }>("/clippings", async (request) => {
+    const { q, sort, limit, cursor } = request.query;
+    const parsedLimit = limit !== undefined ? Number(limit) : undefined;
+
+    return searchClippings(db, {
+      ...(q !== undefined ? { query: q } : {}),
+      sortDirection: sort === "asc" ? "asc" : "desc",
+      ...(parsedLimit !== undefined && Number.isFinite(parsedLimit)
+        ? { limit: parsedLimit }
+        : {}),
+      cursor: cursor ?? null,
+    });
+  });
 
   return app;
 }

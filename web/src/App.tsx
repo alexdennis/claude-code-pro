@@ -25,9 +25,12 @@ export default function App() {
     fetch("/clippings")
       .then((response) => {
         if (!response.ok) throw new Error(`request failed: ${response.status}`);
-        return response.json() as Promise<Clipping[]>;
+        return response.json() as Promise<{
+          clippings: Clipping[];
+          nextCursor: string | null;
+        }>;
       })
-      .then((clippings) => setState({ status: "loaded", clippings }))
+      .then(({ clippings }) => setState({ status: "loaded", clippings }))
       .catch((error: unknown) =>
         setState({
           status: "error",

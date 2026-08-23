@@ -66,13 +66,13 @@ describe("POST /clippings/import", () => {
 });
 
 describe("GET /clippings", () => {
-  it("returns an empty array before anything has been imported", async () => {
+  it("returns an empty result set before anything has been imported", async () => {
     const app = buildServer(openClippingsStore(":memory:"));
 
     const response = await app.inject({ method: "GET", url: "/clippings" });
 
     expect(response.statusCode).toBe(200);
-    expect(response.json()).toEqual([]);
+    expect(response.json()).toEqual({ clippings: [], nextCursor: null });
   });
 
   it("returns previously imported clippings with their stored fields intact", async () => {
@@ -85,9 +85,9 @@ describe("GET /clippings", () => {
     });
 
     const response = await app.inject({ method: "GET", url: "/clippings" });
-    const [clipping] = response.json();
+    const { clippings } = response.json();
 
-    expect(clipping).toMatchObject({
+    expect(clippings[0]).toMatchObject({
       type: "bookmark",
       title: "Fahrenheit 451",
       author: "Ray Bradbury",
@@ -96,5 +96,78 @@ describe("GET /clippings", () => {
       locationEnd: null,
       content: null,
     });
+  });
+
+  it("filters by the q query param", async () => {
+    const app = buildServer(openClippingsStore(":memory:"));
+
+    await app.inject({
+      method: "POST",
+      url: "/clippings/import",
+      payload: { text: loadFixture("clean-highlight.txt") },
+    });
+    await app.inject({
+      method: "POST",
+      url: "/clippings/import",
+      payload: { text: loadFixture("bookmark.txt") },
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/clippings?q=fahrenheit",
+    });
+    const { clippings } = response.json();
+
+    expect(clippings).toHaveLength(1);
+    expect(clippings[0].title).toBe("Fahrenheit 451");
+  });
+
+  it("paginates via the cursor query param, walking to the end of the results", async () => {
+    const app = buildServer(openClippingsStore(":memory:"));
+
+    await app.inject({
+      method: "POST",
+      url: "/clippings/import",
+      payload: { text: loadFixture("clean-highlight.txt") },
+    });
+    await app.inject({
+      method: "POST",
+      url: "/clippings/import",
+      payload: { text: loadFixture("bookmark.txt") },
+    });
+
+    const page1 = await app.inject({
+      method: "GET",
+      url: "/clippings?limit=1",
+    });
+    const page1Body = page1.json();
+    expect(page1Body.clippings).toHaveLength(1);
+    expect(page1Body.nextCursor).not.toBeNull();
+
+    const page2 = await app.inject({
+      method: "GET",
+      url: `/clippings?limit=1&cursor=${encodeURIComponent(page1Body.nextCursor)}`,
+    });
+    const page2Body = page2.json();
+    expect(page2Body.clippings).toHaveLength(1);
+    expect(page2Body.nextCursor).toBeNull();
+    expect(page2Body.clippings[0].id).not.toBe(page1Body.clippings[0].id);
+  });
+
+  it("falls back to the default limit when the limit query param isn't a valid number", async () => {
+    const app = buildServer(openClippingsStore(":memory:"));
+
+    await app.inject({
+      method: "POST",
+      url: "/clippings/import",
+      payload: { text: loadFixture("clean-highlight.txt") },
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/clippings?limit=not-a-number",
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json().clippings).toHaveLength(1);
   });
 });

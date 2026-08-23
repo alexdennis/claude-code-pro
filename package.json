@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "start": "tsx src/main.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "bench:seed": "tsx bench/generate-dataset.ts",
+    "bench:run": "tsx bench/run-benchmark.ts"
   },
   "repository": {
     "type": "git",
