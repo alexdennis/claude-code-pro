@@ -23,6 +23,43 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
+.controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.controls input[type="search"] {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #e0ddd4;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.controls button,
+.controls select {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #e0ddd4;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.load-more {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid #e0ddd4;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+.load-more:disabled {
+  opacity: 0.6;
+}
+
 .status {
   color: #555;
 }

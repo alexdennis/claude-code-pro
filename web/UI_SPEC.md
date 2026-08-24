@@ -9,8 +9,16 @@ pixel diff alone can't tell the difference.
 - Single column, max width ~640px, centered, with side padding. The page does not
   use the full browser width even on a wide viewport.
 - Page heading "Marginalia" at the top.
-- Below the heading, one of: a loading message, an error message, an empty-state
+- Directly below the heading, a **search bar**: a text input (placeholder
+  "Search title, author, or content…"), a "Search" submit button, and a sort
+  dropdown ("Newest first" / "Oldest first"). Always visible, in every state
+  (loading, error, empty, loaded) — it's a control, not part of the result display.
+- Below the search bar, one of: a loading message, an error message, an empty-state
   message, or the list of clippings. Exactly one of these four is visible at a time.
+- Search is submit-triggered (Enter or the button), not live-as-you-type — the input
+  can hold text that hasn't been searched yet without firing a request.
+- Changing the sort dropdown re-runs the current search immediately (no submit
+  needed) and resets to the first page.
 
 ## Clipping list
 
@@ -33,13 +41,30 @@ pixel diff alone can't tell the difference.
 - **Loading**: a plain status line, no spinner, text along the lines of "Loading…".
 - **Error**: a status line in a distinct (red/warning) color, including the failure
   reason.
-- **Empty**: a plain status line telling the user to import a Kindle export — not a
+- **Empty, no search active**: tells the user to import a Kindle export — not a
   blank page with no explanation.
+- **Empty, search active**: a different message naming the search term (e.g.
+  `No clippings match "foo".`) — must not show the "import a Kindle export" message
+  when the database has data but the search just didn't match anything, since that
+  would misleadingly suggest the whole database is empty.
 - **Loaded with data**: the clipping list, no status line.
+
+## Pagination
+
+- When more results exist beyond the current page, a **"Load more"** button
+  appears centered below the list.
+- Clicking it appends the next page's cards to the bottom of the existing list —
+  it does not replace or scroll-reset the current results.
+- While a "Load more" fetch is in flight, the button is disabled and its label
+  changes to "Loading…".
+- The button is absent entirely once there are no more pages (not disabled — not
+  rendered at all).
 
 ## What's explicitly out of scope right now
 
-No sorting/filtering controls, no pagination, no per-clipping actions (edit/delete),
-no dark mode. If a screenshot shows any of these, that's either a real feature that
-needs its own spec update, or evidence a diff caught something unintended — check
-which.
+No per-clipping actions (edit/delete), no dark mode, no debounced/live-as-you-type
+search, no jump-to-page navigation (only "next page" via Load more — this is a
+direct consequence of using cursor-based pagination, which trades random page
+access for pagination that never degrades with depth). If a screenshot shows any of
+these, that's either a real feature that needs its own spec update, or evidence a
+diff caught something unintended — check which.

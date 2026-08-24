@@ -42,3 +42,59 @@ test("multiple clippings render as stacked cards matching the UI spec", async ({
   await expect(page.getByText("Fahrenheit 451")).toBeVisible();
   await expect(page).toHaveScreenshot("loaded-state.png");
 });
+
+test("search filters the visible list to matching clippings only", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.fill('input[type="search"]', "fahrenheit");
+  await page.click('button[type="submit"]');
+
+  await expect(page.getByText("Fahrenheit 451")).toBeVisible();
+  await expect(
+    page.getByText("The Design of Everyday Things"),
+  ).not.toBeVisible();
+});
+
+test("a search with no matches shows a distinct message naming the term", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.fill('input[type="search"]', "zzz-nonexistent-term-zzz");
+  await page.click('button[type="submit"]');
+
+  await expect(
+    page.getByText('No clippings match "zzz-nonexistent-term-zzz".'),
+  ).toBeVisible();
+  await expect(page.getByText("No clippings yet.")).not.toBeVisible();
+});
+
+test("Load more appends the next page instead of replacing the current results", async ({
+  page,
+  request,
+}) => {
+  const highlightText = loadFixture("clean-highlight.txt");
+  for (let i = 0; i < 51; i++) {
+    const response = await request.post(
+      "http://localhost:3000/clippings/import",
+      {
+        data: { text: highlightText },
+      },
+    );
+    expect(response.ok()).toBe(true);
+  }
+
+  await page.goto("/");
+  await page.fill('input[type="search"]', "The Design of Everyday Things");
+  await page.click('button[type="submit"]');
+
+  await expect(page.locator("li.clipping")).toHaveCount(50);
+  await expect(page.locator("button.load-more")).toBeVisible();
+
+  const initialCount = await page.locator("li.clipping").count();
+  await page.click("button.load-more");
+
+  await expect
+    .poll(async () => page.locator("li.clipping").count())
+    .toBeGreaterThan(initialCount);
+});
