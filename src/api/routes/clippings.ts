@@ -1,10 +1,6 @@
 import type { FastifyInstance } from "fastify";
-import type { DatabaseSync } from "node:sqlite";
-import { parseKindleClippings } from "../../core/kindle-clippings.js";
-import {
-  insertClippings,
-  searchClippings,
-} from "../../storage/clippings-store.js";
+import { importClippings } from "../../use-cases/import-clippings.js";
+import type { ClippingsRepository } from "../../use-cases/types.js";
 
 interface ImportBody {
   text: string;
@@ -19,7 +15,7 @@ interface ClippingsQuery {
 
 export function registerClippingsRoutes(
   app: FastifyInstance,
-  db: DatabaseSync,
+  repo: ClippingsRepository,
 ): void {
   app.post<{ Body: ImportBody }>(
     "/clippings/import",
@@ -32,22 +28,8 @@ export function registerClippingsRoutes(
         };
       }
 
-      const results = parseKindleClippings(text);
-      const successes = results.filter((r) => r.ok);
-      const failures = results.filter((r) => !r.ok);
-
-      insertClippings(
-        db,
-        successes.map((r) => r.clipping),
-      );
-
       reply.code(201);
-      return {
-        total: results.length,
-        imported: successes.length,
-        failed: failures.length,
-        errors: failures.map((r) => r.error),
-      };
+      return importClippings(repo, text);
     },
   );
 
@@ -55,7 +37,7 @@ export function registerClippingsRoutes(
     const { q, sort, limit, cursor } = request.query;
     const parsedLimit = limit !== undefined ? Number(limit) : undefined;
 
-    return searchClippings(db, {
+    return repo.search({
       ...(q !== undefined ? { query: q } : {}),
       sortDirection: sort === "asc" ? "asc" : "desc",
       ...(parsedLimit !== undefined && Number.isFinite(parsedLimit)

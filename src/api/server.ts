@@ -1,11 +1,11 @@
 import Fastify, { type FastifyInstance } from "fastify";
-import type { DatabaseSync } from "node:sqlite";
+import type { ClippingsRepository } from "../use-cases/types.js";
 import { registerClippingsRoutes } from "./routes/clippings.js";
 
-export function buildServer(db: DatabaseSync): FastifyInstance {
+export function buildServer(repo: ClippingsRepository): FastifyInstance {
   const app = Fastify();
 
-  registerClippingsRoutes(app, db);
+  registerClippingsRoutes(app, repo);
 
   return app;
 }

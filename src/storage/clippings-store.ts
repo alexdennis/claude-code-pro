@@ -2,8 +2,18 @@ import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import type { Clipping, ClippingType } from "../core/kindle-clippings.js";
+import type {
+  ClippingsRepository,
+  SearchOptions,
+  SearchResult,
+  StoredClipping,
+} from "../use-cases/types.js";
 
-export type StoredClipping = Clipping & { id: number };
+export type {
+  StoredClipping,
+  SearchOptions,
+  SearchResult,
+} from "../use-cases/types.js";
 
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS clippings (
@@ -61,18 +71,6 @@ export function insertClippings(
     db.exec("ROLLBACK");
     throw error;
   }
-}
-
-export interface SearchOptions {
-  query?: string;
-  sortDirection?: "asc" | "desc";
-  limit?: number;
-  cursor?: string | null;
-}
-
-export interface SearchResult {
-  clippings: StoredClipping[];
-  nextCursor: string | null;
 }
 
 const DEFAULT_SEARCH_LIMIT = 50;
@@ -231,4 +229,13 @@ function rowToStoredClipping(row: ClippingRow): StoredClipping {
     case "note":
       return { ...base, type: "note", content: row.content as string };
   }
+}
+
+export function createSqliteClippingsRepository(
+  db: DatabaseSync,
+): ClippingsRepository {
+  return {
+    insert: (clippings) => insertClippings(db, clippings),
+    search: (options) => searchClippings(db, options),
+  };
 }

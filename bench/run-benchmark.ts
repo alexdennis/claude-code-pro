@@ -1,7 +1,10 @@
 import { existsSync } from "node:fs";
 import type { FastifyInstance } from "fastify";
 import { buildServer } from "../src/api/server.js";
-import { openClippingsStore } from "../src/storage/clippings-store.js";
+import {
+  createSqliteClippingsRepository,
+  openClippingsStore,
+} from "../src/storage/clippings-store.js";
 import {
   BENCH_DB_PATH,
   COMMON_MARKER,
@@ -134,7 +137,7 @@ async function main(): Promise<void> {
   }
 
   const db = openClippingsStore(BENCH_DB_PATH);
-  const app = buildServer(db);
+  const app = buildServer(createSqliteClippingsRepository(db));
 
   console.log(
     `Running search benchmark: ${ITERATIONS} timed iterations per scenario (+${WARMUP} warmup), ` +
