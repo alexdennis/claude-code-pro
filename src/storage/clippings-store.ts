@@ -172,29 +172,6 @@ export function searchClippings(
   };
 }
 
-export function listClippings(db: DatabaseSync): StoredClipping[] {
-  const rows = db
-    .prepare(
-      `SELECT
-      id,
-      type,
-      title,
-      author,
-      page,
-      location_start AS locationStart,
-      location_end AS locationEnd,
-      added_at AS addedAt,
-      added_at_raw AS addedAtRaw,
-      content
-    FROM clippings
-    ORDER BY id`,
-    )
-    .all();
-
-  // node:sqlite types rows as a generic string-keyed record; narrow to our known shape.
-  return rows.map((row) => rowToStoredClipping(row as unknown as ClippingRow));
-}
-
 interface ClippingRow {
   id: number;
   type: string;

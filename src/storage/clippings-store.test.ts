@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   insertClippings,
-  listClippings,
   openClippingsStore,
   searchClippings,
 } from "./clippings-store.js";
@@ -44,11 +43,11 @@ const bookmark: Bookmark = {
 };
 
 describe("clippings-store", () => {
-  it("round-trips a highlight, note, and bookmark with distinct ids in insertion order", () => {
+  it("round-trips a highlight, note, and bookmark with distinct ids, sorted by addedAt ascending", () => {
     const db = openClippingsStore(":memory:");
     insertClippings(db, [highlight, note, bookmark]);
 
-    const stored = listClippings(db);
+    const { clippings: stored } = searchClippings(db, { sortDirection: "asc" });
     expect(stored).toHaveLength(3);
 
     expect(stored[0]).toMatchObject(highlight);
@@ -64,7 +63,9 @@ describe("clippings-store", () => {
     const db = openClippingsStore(":memory:");
     insertClippings(db, [bookmark]);
 
-    const [stored] = listClippings(db);
+    const {
+      clippings: [stored],
+    } = searchClippings(db);
     expect(stored?.addedAt).toBeNull();
     expect(stored?.addedAtRaw).toBe("unparseable date");
   });
@@ -73,14 +74,14 @@ describe("clippings-store", () => {
     const db = openClippingsStore(":memory:");
     insertClippings(db, [highlight, highlight]);
 
-    const stored = listClippings(db);
+    const { clippings: stored } = searchClippings(db);
     expect(stored).toHaveLength(2);
     expect(stored[0]?.id).not.toBe(stored[1]?.id);
   });
 
   it("returns an empty array from a freshly opened store", () => {
     const db = openClippingsStore(":memory:");
-    expect(listClippings(db)).toEqual([]);
+    expect(searchClippings(db).clippings).toEqual([]);
   });
 });
 
