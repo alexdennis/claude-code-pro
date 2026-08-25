@@ -142,6 +142,64 @@ haven't invoked, and re-run the suite to see what actually mattered.
 6. Log the session in `TRACKER.md` before you close the terminal. This is the part
    everyone skips and it's the part that makes the repo worth having.
 
+## Working in worktrees
+
+Two bits of config make `claude --worktree` actually pleasant to use here, both
+already in the repo:
+
+- **`.worktreeinclude`** (repo root, `.gitignore` syntax) — gitignored files listed
+  here (currently `.env`, `.env.local`) get copied into every new worktree
+  automatically. Without it, a fresh worktree has none of your local secrets.
+- **`worktree.symlinkDirectories`** in `.claude/settings.json` — symlinks
+  `node_modules` and `web/node_modules` from the main checkout into new worktrees,
+  so each one doesn't need its own multi-second `npm install`.
+
+**Starting parallel sessions:** open one terminal per feature and run
+
+```bash
+claude --worktree feature-name
+```
+
+Each call creates a new git worktree + branch under `.claude/worktrees/<name>/`
+and starts a completely fresh session there — it has no memory of whatever
+conversation set the work up, so hand it a self-contained prompt describing
+exactly what to build and what NOT to touch (shared files like `server.ts` are
+the thing to keep out of scope, since three branches all editing the same file is
+the #1 source of merge conflicts).
+
+**Watching progress from outside those sessions:**
+
+```bash
+git worktree list                                    # see all active worktrees
+git -C .claude/worktrees/feature-name status --short  # uncommitted work in one
+git log --oneline main..worktree-feature-name         # committed work only —
+                                                       # empty until that session
+                                                       # actually runs git commit
+```
+
+**Merging:** do it from one coordinating session, one branch at a time, not from
+each worktree session independently — three sessions merging into `main`
+concurrently is a race, even if their files never conflict. Validate on a
+throwaway branch first if you want real confidence before touching `main`:
+
+```bash
+git checkout -b temp-validation main
+git merge --no-ff worktree-feature-a
+git merge --no-ff worktree-feature-b
+# run the test suite here — a clean git merge doesn't guarantee the code
+# actually works together
+git checkout main && git branch -D temp-validation   # then repeat for real
+```
+
+**Cleanup once merged:**
+
+```bash
+git worktree remove .claude/worktrees/feature-name
+git branch -d worktree-feature-name   # -d (lowercase) refuses to delete
+                                       # anything not fully merged — use it,
+                                       # not -D, as a safety check
+```
+
 ## Setup
 
 ```bash
