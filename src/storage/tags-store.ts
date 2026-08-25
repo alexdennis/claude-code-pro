@@ -5,6 +5,7 @@ export interface TagsRepository {
   addTag(clippingId: number, tag: string): void;
   removeTag(clippingId: number, tag: string): void;
   listClippingsByTag(tag: string): StoredClipping[];
+  listTagsForClipping(clippingId: number): string[];
 }
 
 const SCHEMA = `
@@ -102,11 +103,25 @@ export function listClippingsByTag(
   return rows.map(rowToStoredClipping);
 }
 
+export function listTagsForClipping(
+  db: DatabaseSync,
+  clippingId: number,
+): string[] {
+  const rows = db
+    .prepare(
+      `SELECT tag FROM clipping_tags WHERE clipping_id = ? ORDER BY tag ASC`,
+    )
+    .all(clippingId) as unknown as { tag: string }[];
+
+  return rows.map((row) => row.tag);
+}
+
 export function createSqliteTagsRepository(db: DatabaseSync): TagsRepository {
   openTagsStore(db);
   return {
     addTag: (clippingId, tag) => addTag(db, clippingId, tag),
     removeTag: (clippingId, tag) => removeTag(db, clippingId, tag),
     listClippingsByTag: (tag) => listClippingsByTag(db, tag),
+    listTagsForClipping: (clippingId) => listTagsForClipping(db, clippingId),
   };
 }

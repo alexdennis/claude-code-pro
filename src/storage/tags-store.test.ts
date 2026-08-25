@@ -132,4 +132,53 @@ describe("tags-store", () => {
       ["First"],
     );
   });
+
+  it("lists a clipping's tags in alphabetical order", () => {
+    const db = openClippingsStore(":memory:");
+    const clippingsRepo = createSqliteClippingsRepository(db);
+    const tagsRepo = createSqliteTagsRepository(db);
+
+    clippingsRepo.insert([makeHighlight()]);
+    const {
+      clippings: [stored],
+    } = clippingsRepo.search();
+    if (stored === undefined) throw new Error("expected a stored clipping");
+
+    tagsRepo.addTag(stored.id, "zebra");
+    tagsRepo.addTag(stored.id, "apple");
+
+    expect(tagsRepo.listTagsForClipping(stored.id)).toEqual(["apple", "zebra"]);
+  });
+
+  it("returns an empty array for a clipping with no tags", () => {
+    const db = openClippingsStore(":memory:");
+    const clippingsRepo = createSqliteClippingsRepository(db);
+    const tagsRepo = createSqliteTagsRepository(db);
+
+    clippingsRepo.insert([makeHighlight()]);
+    const {
+      clippings: [stored],
+    } = clippingsRepo.search();
+    if (stored === undefined) throw new Error("expected a stored clipping");
+
+    expect(tagsRepo.listTagsForClipping(stored.id)).toEqual([]);
+  });
+
+  it("no longer lists a removed tag", () => {
+    const db = openClippingsStore(":memory:");
+    const clippingsRepo = createSqliteClippingsRepository(db);
+    const tagsRepo = createSqliteTagsRepository(db);
+
+    clippingsRepo.insert([makeHighlight()]);
+    const {
+      clippings: [stored],
+    } = clippingsRepo.search();
+    if (stored === undefined) throw new Error("expected a stored clipping");
+
+    tagsRepo.addTag(stored.id, "todo");
+    tagsRepo.addTag(stored.id, "favorite");
+    tagsRepo.removeTag(stored.id, "todo");
+
+    expect(tagsRepo.listTagsForClipping(stored.id)).toEqual(["favorite"]);
+  });
 });

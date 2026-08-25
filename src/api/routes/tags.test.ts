@@ -157,3 +157,61 @@ describe("GET /tags/:tag/clippings", () => {
     expect(response.json()).toEqual({ clippings: [] });
   });
 });
+
+describe("GET /clippings/:id/tags", () => {
+  it("returns the tags currently on a clipping", async () => {
+    const { app, clippingsRepo } = buildTestApp();
+    clippingsRepo.insert([highlight]);
+    const {
+      clippings: [stored],
+    } = clippingsRepo.search();
+    if (stored === undefined) throw new Error("expected a stored clipping");
+
+    await app.inject({
+      method: "POST",
+      url: `/clippings/${stored.id}/tags`,
+      payload: { tag: "todo" },
+    });
+    await app.inject({
+      method: "POST",
+      url: `/clippings/${stored.id}/tags`,
+      payload: { tag: "favorite" },
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: `/clippings/${stored.id}/tags`,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ tags: ["favorite", "todo"] });
+  });
+
+  it("returns an empty array for a clipping with no tags", async () => {
+    const { app, clippingsRepo } = buildTestApp();
+    clippingsRepo.insert([highlight]);
+    const {
+      clippings: [stored],
+    } = clippingsRepo.search();
+    if (stored === undefined) throw new Error("expected a stored clipping");
+
+    const response = await app.inject({
+      method: "GET",
+      url: `/clippings/${stored.id}/tags`,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ tags: [] });
+  });
+
+  it("returns 400 when the id path param isn't an integer", async () => {
+    const { app } = buildTestApp();
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/clippings/not-a-number/tags",
+    });
+
+    expect(response.statusCode).toBe(400);
+  });
+});

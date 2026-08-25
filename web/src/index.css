@@ -20,7 +20,13 @@ main {
 
 h1 {
   font-size: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stats {
+  color: #555;
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
 }
 
 .controls {
@@ -44,6 +50,19 @@ h1 {
   border-radius: 6px;
   background: #fff;
   font-size: 0.95rem;
+}
+
+.export-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #e0ddd4;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #1c1c1c;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .load-more {
@@ -123,4 +142,43 @@ h1 {
 .content {
   margin: 0;
   line-height: 1.5;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f0eee7;
+  color: #4b4636;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.tag-chip button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+}
+
+.add-tag input {
+  border: 1px dashed #cfc9ba;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  background: transparent;
+  width: 6rem;
 }

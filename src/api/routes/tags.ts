@@ -66,4 +66,18 @@ export function registerTagsRoutes(
       return { clippings: tagsRepo.listClippingsByTag(tag) };
     },
   );
+
+  app.get<{ Params: TagParams }>(
+    "/clippings/:id/tags",
+    async (request, reply) => {
+      const clippingId = Number(request.params.id);
+
+      if (!Number.isInteger(clippingId)) {
+        reply.code(400);
+        return { error: "id must be an integer path param" };
+      }
+
+      return { tags: tagsRepo.listTagsForClipping(clippingId) };
+    },
+  );
 }

@@ -9,10 +9,18 @@ pixel diff alone can't tell the difference.
 - Single column, max width ~640px, centered, with side padding. The page does not
   use the full browser width even on a wide viewport.
 - Page heading "Marginalia" at the top.
-- Directly below the heading, a **search bar**: a text input (placeholder
-  "Search title, author, or content…"), a "Search" submit button, and a sort
-  dropdown ("Newest first" / "Oldest first"). Always visible, in every state
-  (loading, error, empty, loaded) — it's a control, not part of the result display.
+- Directly below the heading, a **stats summary line** (e.g. "12 clippings — 8
+  highlights, 3 notes, 1 bookmarks · 5 authors") — only rendered once
+  `GET /clippings/stats` has actually returned; absent (not a placeholder/loading
+  state) before then or if that fetch fails. This is a supplementary line, not a
+  control — it never blocks or gates the rest of the page.
+- Below the stats line, a **search bar**: a text input (placeholder
+  "Search title, author, or content…"), a "Search" submit button, a sort dropdown
+  ("Newest first" / "Oldest first"), and an **"Export as Markdown" link** that
+  navigates to `GET /clippings/export`, carrying whatever `q`/`sort` is currently
+  active — exporting matches what's currently searched/sorted, not always
+  everything. All four controls are always visible, in every state (loading,
+  error, empty, loaded) — they're controls, not part of the result display.
 - Below the search bar, one of: a loading message, an error message, an empty-state
   message, or the list of clippings. Exactly one of these four is visible at a time.
 - Search is submit-triggered (Enter or the button), not live-as-you-type — the input
@@ -35,10 +43,22 @@ pixel diff alone can't tell the difference.
      the clipping has a non-null author.
   4. The **content**, normal weight — only present when the clipping has non-null
      content. Bookmarks never show a content line (their content is always null).
+  5. A **tags row**: any tags already on the clipping as small rounded chips (each
+     with a "×" remove button), followed by a dashed-border "add tag…" input.
+     Tags load asynchronously per-card after the card itself renders — a card is
+     never blocked on its tags to display its title/author/content. A failed tag
+     fetch leaves the row showing just the empty add-tag input, not an error.
 
 ## States
 
 - **Loading**: a plain status line, no spinner, text along the lines of "Loading…".
+  Only shown on the very first page load. A subsequent search or sort change does
+  _not_ re-enter this state — the previous results stay visible until the new ones
+  are ready, then swap atomically. This is deliberate, not an oversight: briefly
+  unmounting the whole list on every search was destroying in-progress local state
+  on cards that survive the search (e.g. a tag being typed but not yet submitted),
+  since React's key-based reconciliation can only preserve a component's state
+  across a re-render if the component's parent stays mounted the whole time.
 - **Error**: a status line in a distinct (red/warning) color, including the failure
   reason.
 - **Empty, no search active**: tells the user to import a Kindle export — not a
@@ -62,9 +82,14 @@ pixel diff alone can't tell the difference.
 
 ## What's explicitly out of scope right now
 
-No per-clipping actions (edit/delete), no dark mode, no debounced/live-as-you-type
-search, no jump-to-page navigation (only "next page" via Load more — this is a
-direct consequence of using cursor-based pagination, which trades random page
-access for pagination that never degrades with depth). If a screenshot shows any of
-these, that's either a real feature that needs its own spec update, or evidence a
-diff caught something unintended — check which.
+No per-clipping edit/delete of the clipping itself (tags are the one exception —
+they're addable/removable), no dark mode, no debounced/live-as-you-type search, no
+jump-to-page navigation (only "next page" via Load more — this is a direct
+consequence of using cursor-based pagination, which trades random page access for
+pagination that never degrades with depth), no tag-based filtering in the UI (the
+`GET /tags/:tag/clippings` endpoint exists but nothing in the UI links to it yet),
+no visible loading/error state for the stats line or per-card tags specifically —
+both fail silently rather than surfacing their own error UI, since they're
+supplementary to the core clipping list. If a screenshot shows any of these, that's
+either a real feature that needs its own spec update, or evidence a diff caught
+something unintended — check which.
