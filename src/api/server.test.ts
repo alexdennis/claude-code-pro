@@ -1,10 +1,13 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import type { FastifyInstance } from "fastify";
 import { describe, expect, it } from "vitest";
 import {
   createSqliteClippingsRepository,
   openClippingsStore,
 } from "../storage/clippings-store.js";
+import { createSqliteClippingsStatsRepository } from "../storage/clippings-stats-store.js";
+import { createSqliteTagsRepository } from "../storage/tags-store.js";
 import { buildServer } from "./server.js";
 
 const fixturesDir = path.join(
@@ -19,11 +22,18 @@ function loadFixture(name: string): string {
   return readFileSync(path.join(fixturesDir, name), "utf-8");
 }
 
+function buildTestServer(): FastifyInstance {
+  const db = openClippingsStore(":memory:");
+  return buildServer({
+    clippingsRepo: createSqliteClippingsRepository(db),
+    statsRepo: createSqliteClippingsStatsRepository(db),
+    tagsRepo: createSqliteTagsRepository(db),
+  });
+}
+
 describe("POST /clippings/import", () => {
   it("parses and persists a clean export, reporting a summary", async () => {
-    const app = buildServer(
-      createSqliteClippingsRepository(openClippingsStore(":memory:")),
-    );
+    const app = buildTestServer();
 
     const response = await app.inject({
       method: "POST",
@@ -41,9 +51,7 @@ describe("POST /clippings/import", () => {
   });
 
   it("reports failures without importing them, alongside successes from the same file", async () => {
-    const app = buildServer(
-      createSqliteClippingsRepository(openClippingsStore(":memory:")),
-    );
+    const app = buildTestServer();
 
     const response = await app.inject({
       method: "POST",
@@ -60,9 +68,7 @@ describe("POST /clippings/import", () => {
   });
 
   it("returns 400 when the body has no string 'text' field", async () => {
-    const app = buildServer(
-      createSqliteClippingsRepository(openClippingsStore(":memory:")),
-    );
+    const app = buildTestServer();
 
     const response = await app.inject({
       method: "POST",
@@ -76,9 +82,7 @@ describe("POST /clippings/import", () => {
 
 describe("GET /clippings", () => {
   it("returns an empty result set before anything has been imported", async () => {
-    const app = buildServer(
-      createSqliteClippingsRepository(openClippingsStore(":memory:")),
-    );
+    const app = buildTestServer();
 
     const response = await app.inject({ method: "GET", url: "/clippings" });
 
@@ -87,9 +91,7 @@ describe("GET /clippings", () => {
   });
 
   it("returns previously imported clippings with their stored fields intact", async () => {
-    const app = buildServer(
-      createSqliteClippingsRepository(openClippingsStore(":memory:")),
-    );
+    const app = buildTestServer();
 
     await app.inject({
       method: "POST",
@@ -112,9 +114,7 @@ describe("GET /clippings", () => {
   });
 
   it("filters by the q query param", async () => {
-    const app = buildServer(
-      createSqliteClippingsRepository(openClippingsStore(":memory:")),
-    );
+    const app = buildTestServer();
 
     await app.inject({
       method: "POST",
@@ -138,9 +138,7 @@ describe("GET /clippings", () => {
   });
 
   it("paginates via the cursor query param, walking to the end of the results", async () => {
-    const app = buildServer(
-      createSqliteClippingsRepository(openClippingsStore(":memory:")),
-    );
+    const app = buildTestServer();
 
     await app.inject({
       method: "POST",
@@ -172,9 +170,7 @@ describe("GET /clippings", () => {
   });
 
   it("falls back to the default limit when the limit query param isn't a valid number", async () => {
-    const app = buildServer(
-      createSqliteClippingsRepository(openClippingsStore(":memory:")),
-    );
+    const app = buildTestServer();
 
     await app.inject({
       method: "POST",

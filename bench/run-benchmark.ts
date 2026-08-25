@@ -5,6 +5,8 @@ import {
   createSqliteClippingsRepository,
   openClippingsStore,
 } from "../src/storage/clippings-store.js";
+import { createSqliteClippingsStatsRepository } from "../src/storage/clippings-stats-store.js";
+import { createSqliteTagsRepository } from "../src/storage/tags-store.js";
 import {
   BENCH_DB_PATH,
   COMMON_MARKER,
@@ -137,7 +139,11 @@ async function main(): Promise<void> {
   }
 
   const db = openClippingsStore(BENCH_DB_PATH);
-  const app = buildServer(createSqliteClippingsRepository(db));
+  const app = buildServer({
+    clippingsRepo: createSqliteClippingsRepository(db),
+    statsRepo: createSqliteClippingsStatsRepository(db),
+    tagsRepo: createSqliteTagsRepository(db),
+  });
 
   console.log(
     `Running search benchmark: ${ITERATIONS} timed iterations per scenario (+${WARMUP} warmup), ` +
