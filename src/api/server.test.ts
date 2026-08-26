@@ -107,8 +107,7 @@ describe("GET /clippings", () => {
       title: "Fahrenheit 451",
       author: "Ray Bradbury",
       page: null,
-      locationStart: 346,
-      locationEnd: null,
+      location: { start: 346, end: null },
       content: null,
     });
   });
