@@ -39,8 +39,7 @@ describe("parseKindleClippings", () => {
       title: "The Design of Everyday Things",
       author: "Don Norman",
       page: 34,
-      locationStart: 512,
-      locationEnd: 514,
+      location: { start: 512, end: 514 },
       addedAtRaw: "Tuesday, 12 January 2021 09:15:22",
       content:
         "Good design is actually a lot harder to notice than poor design, in part because good designs fit our needs so well that the design is invisible.",
@@ -59,8 +58,7 @@ describe("parseKindleClippings", () => {
       title: "The Design of Everyday Things",
       author: "Don Norman",
       page: 34,
-      locationStart: 513,
-      locationEnd: null,
+      location: { start: 513, end: null },
       content: "Reminds me of the door handle example from chapter 1.",
     });
   });
@@ -75,8 +73,7 @@ describe("parseKindleClippings", () => {
       title: "Fahrenheit 451",
       author: "Ray Bradbury",
       page: null,
-      locationStart: 346,
-      locationEnd: null,
+      location: { start: 346, end: null },
       content: null,
     });
   });
@@ -98,8 +95,7 @@ describe("parseKindleClippings", () => {
     expect(clipping).toMatchObject({
       type: "highlight",
       page: null,
-      locationStart: 2044,
-      locationEnd: null,
+      location: { start: 2044, end: null },
     });
   });
 
@@ -112,7 +108,7 @@ describe("parseKindleClippings", () => {
     const first = expectSuccess(results[0]);
     const second = expectSuccess(results[1]);
     expect(first.content).toBe(second.content);
-    expect(first.locationStart).toBe(second.locationStart);
+    expect(first.location.start).toBe(second.location.start);
     expect(first.addedAtRaw).not.toBe(second.addedAtRaw);
   });
 
@@ -184,8 +180,7 @@ describe("parseKindleClippings", () => {
       title: "The Design of Everyday Things",
       author: "Don Norman",
       page: 34,
-      locationStart: 512,
-      locationEnd: 514,
+      location: { start: 512, end: 514 },
       content:
         "Good design is actually a lot harder to notice than poor design, in part because good designs fit our needs so well that the design is invisible.",
     });
@@ -204,8 +199,7 @@ describe("parseKindleClippings", () => {
       title: "Zero to One",
       author: "Peter Thiel",
       page: 5,
-      locationStart: 88,
-      locationEnd: 90,
+      location: { start: 88, end: 90 },
       content: "Doing what already exists takes the world from 1 to n.",
     });
   });
@@ -246,8 +240,7 @@ describe("parseKindleClippings", () => {
       title: "Meditations",
       author: "Marcus Aurelius",
       page: 12,
-      locationStart: 200,
-      locationEnd: 202,
+      location: { start: 200, end: 202 },
       content: "You have power over your mind, not outside events.",
     });
 
@@ -255,8 +248,7 @@ describe("parseKindleClippings", () => {
     expect(bookmark).toMatchObject({
       type: "bookmark",
       page: null,
-      locationStart: 450,
-      locationEnd: null,
+      location: { start: 450, end: null },
       content: null,
     });
   });
