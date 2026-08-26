@@ -60,8 +60,7 @@ function rowToStoredClipping(row: ClippingRow): StoredClipping {
     title: row.title,
     author: row.author,
     page: row.page,
-    locationStart: row.locationStart,
-    locationEnd: row.locationEnd,
+    location: { start: row.locationStart, end: row.locationEnd },
     addedAt: row.addedAt === null ? null : new Date(row.addedAt),
     addedAtRaw: row.addedAtRaw,
   };

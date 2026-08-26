@@ -6,8 +6,7 @@ interface Clipping {
   title: string;
   author: string | null;
   page: number | null;
-  locationStart: number;
-  locationEnd: number | null;
+  location: { start: number; end: number | null };
   addedAt: string | null;
   addedAtRaw: string;
   content: string | null;

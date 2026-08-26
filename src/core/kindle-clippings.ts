@@ -5,8 +5,7 @@ interface ClippingBase {
   title: string;
   author: string | null;
   page: number | null;
-  locationStart: number;
-  locationEnd: number | null;
+  location: { start: number; end: number | null };
   addedAt: Date | null;
   addedAtRaw: string;
   content: string | null;
@@ -117,8 +116,7 @@ function parseEntry(raw: string): ParseResult {
     title,
     author,
     page,
-    locationStart,
-    locationEnd,
+    location: { start: locationStart, end: locationEnd },
     addedAt,
     addedAtRaw: addedAtRaw as string,
   };

@@ -148,8 +148,7 @@ interface BaseFields {
   title: string;
   author: string | null;
   page: number | null;
-  locationStart: number;
-  locationEnd: number | null;
+  location: { start: number; end: number | null };
   addedAt: Date | null;
   addedAtRaw: string;
 }
@@ -208,8 +207,7 @@ export function generateDataset(): Clipping[] {
       title: pick(rng, TITLE_POOL),
       author: rng() < 0.9 ? pick(rng, AUTHOR_POOL) : null,
       page: rng() < 0.8 ? 1 + Math.floor(rng() * 400) : null,
-      locationStart: 1 + Math.floor(rng() * 50_000),
-      locationEnd: null,
+      location: { start: 1 + Math.floor(rng() * 50_000), end: null },
       addedAt,
       addedAtRaw:
         addedAt === null ? "an unparseable date string" : addedAt.toISOString(),
