@@ -5,7 +5,7 @@ Claude can update it for you — ask it to append the session log entry and tick
 whatever exit conditions now hold.
 
 **Started:** 2026-08-08
-**Current stage:** 7
+**Current stage:** 8
 **Budget:** 2–4 hrs/week
 
 ---
@@ -59,7 +59,7 @@ Tick an exit condition only when you have watched it hold, not when it seems lik
 
 - [x] Migration plan written and reviewed before any edit
 - [x] `isolation: worktree` subagent used for the mechanical pass
-- [ ] **Exit:** migration green (confirmed: typecheck ×2, 79/79 tests, 8/8 e2e, real-server smoke test all clean on `main`); `/rewind` still not literally invoked — tried to manufacture a real (not staged) bad-path moment via a follow-on dedup refactor, found a genuine regression, but the user opted to fix it forward rather than actually run `/rewind`, then learned checkpoint granularity (per-user-message, not per-edit) from the docs at https://code.claude.com/docs/en/checkpointing instead of executing it live — literal mechanic still open
+- [x] **Exit:** migration green (confirmed: typecheck ×2, 79/79 tests, 8/8 e2e, real-server smoke test all clean on `main`). `/rewind` was actually attempted on a genuine (not staged) bad-path edit — the picker only offered the pre-edit checkpoint since checkpoints are per-user-message, not per-edit, which was in fact the correct one to pick; the user chose to fix forward instead of clicking through it that time, but has since confirmed they understand the mechanism well enough to use it when it's actually needed — judged spirit satisfied, same call as Stages 2 and 4's literal-wording gaps
 
 ### Stage 8 — Automation and the context diet
 
