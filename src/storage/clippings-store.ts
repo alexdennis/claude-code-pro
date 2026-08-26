@@ -1,7 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import type { Clipping, ClippingType } from "../core/kindle-clippings.js";
+import type { Clipping } from "../core/kindle-clippings.js";
 import type {
   ClippingsRepository,
   SearchOptions,
@@ -172,7 +172,7 @@ export function searchClippings(
   };
 }
 
-interface ClippingRow {
+export interface ClippingRow {
   id: number;
   type: string;
   title: string;
@@ -185,7 +185,7 @@ interface ClippingRow {
   content: string | null;
 }
 
-function rowToStoredClipping(row: ClippingRow): StoredClipping {
+export function rowToStoredClipping(row: ClippingRow): StoredClipping {
   const base = {
     id: row.id,
     title: row.title,
@@ -196,14 +196,17 @@ function rowToStoredClipping(row: ClippingRow): StoredClipping {
     addedAtRaw: row.addedAtRaw,
   };
 
-  const type = row.type as ClippingType;
-  switch (type) {
+  switch (row.type) {
     case "bookmark":
       return { ...base, type: "bookmark", content: null };
     case "highlight":
       return { ...base, type: "highlight", content: row.content as string };
     case "note":
       return { ...base, type: "note", content: row.content as string };
+    default:
+      // Defends listClippingsByTag's join in tags-store.ts, which reads rows
+      // this function doesn't fully control the provenance of.
+      throw new Error(`unknown clipping type: ${row.type}`);
   }
 }
 

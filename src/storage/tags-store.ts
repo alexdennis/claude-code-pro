@@ -1,5 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import type { StoredClipping } from "../use-cases/types.js";
+import type { ClippingRow } from "./clippings-store.js";
+import { rowToStoredClipping } from "./clippings-store.js";
 
 export interface TagsRepository {
   addTag(clippingId: number, tag: string): void;
@@ -39,44 +41,6 @@ export function removeTag(
     clippingId,
     tag,
   );
-}
-
-interface ClippingRow {
-  id: number;
-  type: string;
-  title: string;
-  author: string | null;
-  page: number | null;
-  locationStart: number;
-  locationEnd: number | null;
-  addedAt: string | null;
-  addedAtRaw: string;
-  content: string | null;
-}
-
-function rowToStoredClipping(row: ClippingRow): StoredClipping {
-  const base = {
-    id: row.id,
-    title: row.title,
-    author: row.author,
-    page: row.page,
-    location: { start: row.locationStart, end: row.locationEnd },
-    addedAt: row.addedAt === null ? null : new Date(row.addedAt),
-    addedAtRaw: row.addedAtRaw,
-  };
-
-  switch (row.type) {
-    case "bookmark":
-      return { ...base, type: "bookmark", content: null };
-    case "highlight":
-      return { ...base, type: "highlight", content: row.content as string };
-    case "note":
-      return { ...base, type: "note", content: row.content as string };
-    default:
-      // Existing rows are always written by clippings-store, which only ever
-      // writes one of the three known types.
-      throw new Error(`unknown clipping type: ${row.type}`);
-  }
 }
 
 export function listClippingsByTag(

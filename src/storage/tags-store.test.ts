@@ -28,6 +28,24 @@ describe("tags-store", () => {
     expect(tagsRepo.listClippingsByTag("todo")).toEqual([]);
   });
 
+  it("throws rather than silently dropping a tagged row with an unrecognized type", () => {
+    const db = openClippingsStore(":memory:");
+    const tagsRepo = createSqliteTagsRepository(db);
+
+    const { lastInsertRowid } = db
+      .prepare(
+        `INSERT INTO clippings
+          (type, title, author, page, location_start, location_end, added_at, added_at_raw, content)
+         VALUES ('quote', 'Untitled', NULL, NULL, 1, NULL, NULL, 'irrelevant', 'filler')`,
+      )
+      .run();
+    tagsRepo.addTag(Number(lastInsertRowid), "todo");
+
+    expect(() => tagsRepo.listClippingsByTag("todo")).toThrow(
+      "unknown clipping type",
+    );
+  });
+
   it("returns a tagged clipping via listClippingsByTag, joined against the clippings table", () => {
     const db = openClippingsStore(":memory:");
     const clippingsRepo = createSqliteClippingsRepository(db);
