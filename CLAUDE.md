@@ -17,5 +17,3 @@ Run `npm test` and `npm run typecheck`. Report the actual output, not a summary 
 
 This file is intentionally short. If you need context, read the code — don't ask me
 to write it down here. If a rule here is wrong or stale, say so.
-
-<!-- Stage 8: cut this file down. Delete rules and see what actually breaks. -->
